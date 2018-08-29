@@ -659,10 +659,6 @@ void	useprefs()
 	|| prefs.check_type[i] == CHECK_DISKS
 	|| prefs.check_type[i] == CHECK_SUBDISKS)
         prefs.prof_flag = 1;
-  if (prefs.prof_flag)
-    prefs.psf_flag = 1;
-  if (prefs.dprof_flag)
-    prefs.dpsf_flag = 1;
 
 /*-------------------------- Tracking the PSF FWHM --------------------------*/
   if (prefs.seeing_fwhm == 0 && (FLAG(obj2.sprob) || FLAG(obj2.fwhm_psf)))

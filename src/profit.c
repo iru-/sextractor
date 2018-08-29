@@ -202,7 +202,7 @@ void	profit_fit(profitstruct *profit,
 
 
   psf = profit->psf;
-  profit->pixstep = psf->pixstep;
+  profit->pixstep = prefs.psf_flag ? psf->pixstep : 1.0;
   obj2->prof_flag = 0;
 
   profit->dgeoflag = (dgeofield != NULL);
@@ -210,7 +210,7 @@ void	profit_fit(profitstruct *profit,
 /* Create pixmaps at image resolution */
   profit->ix = (int)(obj->mx + 0.49999);/* internal convention: 1st pix = 0 */
   profit->iy = (int)(obj->my + 0.49999);/* internal convention: 1st pix = 0 */
-  psf_fwhm = psf->masksize[0]*psf->pixstep;
+  psf_fwhm = prefs.psf_flag ? psf->masksize[0]*psf->pixstep : 0;
   profit->objnaxisn[0] = (((int)((obj->xmax-obj->xmin+1) + psf_fwhm + 0.499)
 		*1.2)/2)*2 + 1;
   profit->objnaxisn[1] = (((int)((obj->ymax-obj->ymin+1) + psf_fwhm + 0.499)
@@ -256,7 +256,8 @@ void	profit_fit(profitstruct *profit,
   profit->obj2 = obj2;
 
 /* Compute the local PSF */
-  profit_psf(profit);
+  if (prefs.psf_flag)
+    profit_psf(profit);
 
   profit->nresi = profit_copyobjpix(profit, field, wfield, dgeofield);
   profit->npresi = 0;
@@ -287,7 +288,10 @@ void	profit_fit(profitstruct *profit,
     profit->guessfluxmax = profit->guessflux;
   if (profit->guessfluxmax <= 0.0)
     profit->guessfluxmax = 1.0;
-  if ((profit->guessradius = 0.5*psf->fwhm) < obj2->hl_radius)
+  if (prefs.psf_flag)
+    if ((profit->guessradius = 0.5*psf->fwhm) < obj2->hl_radius)
+      profit->guessradius = obj2->hl_radius;
+  else
     profit->guessradius = obj2->hl_radius;
   profit->guessaspect = obj->b/obj->a;
   profit->guessposang = obj->theta;
@@ -1876,7 +1880,8 @@ float	*profit_residuals(profitstruct *profit, picstruct *field,
     for (p=0; p<profit->nprof; p++)
       profit->flux += prof_add(profit, profit->prof[p], 0);
     memcpy(profit->cmodpix, profit->modpix, profit->nmodpix*sizeof(float));
-    profit_convolve(profit, profit->cmodpix);
+    if (prefs.psf_flag)
+      profit_convolve(profit, profit->cmodpix);
     profit_resample(profit, profit->cmodpix, profit->lmodpix, 1.0);
     }
 
