@@ -288,10 +288,10 @@ void	profit_fit(profitstruct *profit,
     profit->guessfluxmax = profit->guessflux;
   if (profit->guessfluxmax <= 0.0)
     profit->guessfluxmax = 1.0;
-  if (prefs.psf_flag)
+  if (prefs.psf_flag) {
     if ((profit->guessradius = 0.5*psf->fwhm) < obj2->hl_radius)
       profit->guessradius = obj2->hl_radius;
-  else
+  } else
     profit->guessradius = obj2->hl_radius;
   profit->guessaspect = obj->b/obj->a;
   profit->guessposang = obj->theta;
